@@ -19,10 +19,9 @@ int main(void) {
   State.min_x = -2.00;
   State.min_y = -1.12;
   State.num_iterations = 100;
-  for(int i = 0; i < 255; i++)
-	{
-		double t = i / 255.00;
-		palette[i] = (Color){(0 - t) * 29 + (241) * t,  (1-t) * 189 + (81) * t, (1 - t) * 230 + (94) * t, 255};
+  for(int i = 0; i < 255; i++) {
+    double t = i / 255.00;
+    palette[i] = (Color){(0 - t) * 29 + (241) * t,  (1-t) * 189 + (81) * t, (1 - t) * 230 + (94) * t, 255};
 	}
 	printf("RATIO: %f\n", RATIO);
 	double t0 = GetTime();
@@ -36,7 +35,7 @@ int main(void) {
 	Vector2 Start = {-1,-1};
 	Vector2 End = {-1,-1};
 	int drawing_rectangle = 0;
-	while(!WindowShouldClose())
+  while(!WindowShouldClose())
 	{
 		BeginDrawing();
 		ClearBackground(WHITE);
@@ -49,7 +48,8 @@ int main(void) {
 				Start = GetMousePosition();
 			}
 			Vector2 Pos = GetMousePosition();
-			DrawRectangleLines(Start.x, Start.y, Pos.x - Start.x, Pos.y - Start.y, RED); }
+			DrawRectangleLines(Start.x, Start.y, Pos.x - Start.x, Pos.y - Start.y, RED);
+    }
 		else if(IsMouseButtonReleased(MOUSE_BUTTON_LEFT))
 		{
 			State.num_iterations = 100 + log2(2.47 / (State.max_x - State.min_x)) * 10; 

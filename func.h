@@ -1,5 +1,8 @@
 #include "raylib.h"
 #include "macros.h"
+#include <omp.h>
+
+
 static inline int n_it(float cx, float cy, StateHolder* StatePtr)  
 {
   float zx = 0, zy = 0;
