@@ -3,22 +3,23 @@
 #include <omp.h>
 
 
-static inline int n_it(float cx, float cy, StateHolder* StatePtr)  
+static inline int n_it(long double cx, long double cy, StateHolder* StatePtr)  
 {
-  float zx = 0, zy = 0;
-	float it = 0;
-	float zx_new;
-	while(it < StatePtr -> num_iterations && zx * zx + zy * zy < 4)
+  long double zx = 0.0L, zy = 0.0L;
+	long double it = 0.0L;
+	long double zx_new;
+  
+	while(it < StatePtr -> num_iterations && zx * zx + zy * zy < 4.0L)
 	{
 		zx_new = zx * zx - zy * zy + cx;
-		zy = cy + 2 * zx * zy;
+		zy = cy + 2.0L * zx * zy;
 		it++;
 		zx = zx_new;
 	} 
   return it;
 }
-Color color(int n, float cx, float cy);
-Vector2 to_mandelbrot_coordinates(Vector2 coord, StateHolder* StatePtr); 
+Color color(int n, long double cx, long double cy);
+Vector2L to_mandelbrot_coordinates(Vector2L coord, StateHolder* StatePtr); 
 Image StartingImage(StateHolder* StatePtr);
 void update_Image(Color* pixelptr, Vector2 Start, Vector2 End, StateHolder* StatePtr);
-
+void reset_state(StateHolder* StatePtr);

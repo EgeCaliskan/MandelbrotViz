@@ -2,21 +2,23 @@
 #include "func.h"
 #include "raylib.h"
 #include "omp.h"
-Color color(int n, float cx, float cy);
-Vector2 to_mandelbrot_coordinates(Vector2 coord, StateHolder* StatePtr); 
+Color color(int n, long double cx, long double cy);
+Vector2L to_mandelbrot_coordinates(Vector2L coord, StateHolder* StatePtr); 
 Image StartingImage(StateHolder* StatePtr);
 void update_Image(Color* pixelptr, Vector2 Start, Vector2 End, StateHolder* StatePtr);
-void CalculateMandelbrot(Color* pixelptr, Vector2 Start, Vector2 End, StateHolder* StatePtr)
+
+void reset_state(StateHolder* StatePtr);
+void CalculateMandelbrot(Color* pixelptr, Vector2L Start, Vector2L End, StateHolder* StatePtr)
 { 
   StatePtr->min_x = Start.x;
   StatePtr->max_x = End.x;
   StatePtr->max_y = Start.y;
   StatePtr->min_y = End.y;
   Color* p=pixelptr;  
-  double x_stepsize = (End.x - Start.x) / RES_X;
-  double y_stepsize = (Start.y - End.y) / RES_Y;
-  printf("START (MANDELBROT): %f %f\n", Start.x, Start.y);
-  printf("END (MANDELBROT): %f %f\n",End.x, End.y);
+  long double x_stepsize = (End.x - Start.x) / RES_X;
+  long double y_stepsize = (Start.y - End.y) / RES_Y;
+  printf("START (MANDELBROT): %Lf %Lf\n", Start.x, Start.y);
+  printf("END (MANDELBROT): %Lf %Lf\n",End.x, End.y);
   int val, id;
   omp_set_num_threads(16);
   #pragma omp parallel private(val, id)
@@ -38,9 +40,17 @@ void CalculateMandelbrot(Color* pixelptr, Vector2 Start, Vector2 End, StateHolde
 } // MANDELBROT COORDS
 
 
+void reset_state(StateHolder* StatePtr)
+{
+   StatePtr -> max_x = 0.47L;
+   StatePtr -> max_y = 1.12L;
+   StatePtr -> min_x = -2.00L;
+   StatePtr -> min_y = -1.12L;
+   StatePtr -> num_iterations = 100;
+   return;
+}
 
-
-Color color(int n, float cx, float cy)
+Color color(int n, long double cx, long double cy)
 {
   int c;
   if(cx *  cx + cy * cy > 400)
@@ -49,9 +59,9 @@ Color color(int n, float cx, float cy)
   return (Color){0,c,0,255};
 }
 
-Vector2 to_mandelbrot_coordinates(Vector2 coord, StateHolder* StatePtr)
+Vector2L to_mandelbrot_coordinates(Vector2L coord, StateHolder* StatePtr)
 {
-  Vector2 res;
+  Vector2L res;
   res.x = StatePtr -> min_x + (coord.x) * (StatePtr -> max_x - StatePtr -> min_x) / RES_X;
   res.y = StatePtr -> max_y -  (coord.y) * (StatePtr -> max_y - StatePtr -> min_y) / RES_Y;
   return res;
@@ -60,7 +70,7 @@ Vector2 to_mandelbrot_coordinates(Vector2 coord, StateHolder* StatePtr)
 Image StartingImage(StateHolder* StatePtr)
 {
 
-  float Mult = 1;
+  long double Mult = 1;
   Color* pixels = malloc(sizeof(Color) * RES_X * RES_Y);
   Color* p = pixels;
 
@@ -94,29 +104,28 @@ Image StartingImage(StateHolder* StatePtr)
 
 void update_Image(Color* pixelptr, Vector2 Start, Vector2 End, StateHolder* StatePtr)
 {
-
-  Vector2 UpperLeft, LowerRight;
+  Vector2L UpperLeft, LowerRight;
   UpperLeft.x = MIN(Start.x, End.x);
   UpperLeft.y = MIN(Start.y, End.y);
   LowerRight.x = MAX(Start.x, End.x);
   LowerRight.y = MAX(Start.y, End.y);
   printf("UpperLeft: %f %f\n", UpperLeft.x, UpperLeft.y);
   printf("LowerRight: %f %f\n", LowerRight.x, LowerRight.y);
-  float height = LowerRight.y - UpperLeft.y;
-  float width  = LowerRight.x - UpperLeft.x;
-  float ratio = width / height;
-  float scaled_height = height;
-  float scaled_width = width;
+  long double height = LowerRight.y - UpperLeft.y;
+  long double width  = LowerRight.x - UpperLeft.x;
+  long double ratio = width / height;
+  long double scaled_height = height;
+  long double scaled_width = width;
   printf("WIDTH: %f\n", width);
   printf("HEIGHT: %f\n", height);
   printf("SCALED HEIGHT (1): %f\n", scaled_height);
   if(ratio < RATIO) //   HEIGHT
     scaled_width = RATIO * height;
   else
-    scaled_height = (float)width / (float)RATIO;
+    scaled_height = (long double)width / (long double)RATIO;
   LowerRight.x = UpperLeft.x + scaled_width;
   LowerRight.y = UpperLeft.y + scaled_height;
-  Vector2 ulm = to_mandelbrot_coordinates(UpperLeft, StatePtr);
-  Vector2 lrm = to_mandelbrot_coordinates(LowerRight, StatePtr);
+  Vector2L ulm = to_mandelbrot_coordinates(UpperLeft, StatePtr);
+  Vector2L lrm = to_mandelbrot_coordinates(LowerRight, StatePtr);
   CalculateMandelbrot(pixelptr, ulm, lrm, StatePtr); 
 }
