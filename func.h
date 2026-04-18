@@ -23,3 +23,5 @@ Vector2L to_mandelbrot_coordinates(Vector2L coord, StateHolder* StatePtr);
 Image StartingImage(StateHolder* StatePtr);
 void update_Image(Color* pixelptr, Vector2 Start, Vector2 End, StateHolder* StatePtr);
 void reset_state(StateHolder* StatePtr);
+void update_Image_abs(Color* pixelptr, Vector2L Start, Vector2L End, StateHolder* StatePtr);
+Image BlankStartingImage();

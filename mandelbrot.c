@@ -9,40 +9,56 @@
 #include "raygui.h"
 
 int main(void) {
+  // initializing variables
   int num_iterations = 100;
   long double log_num_iterations;
   Color palette[256];
   StateHolder State;
   reset_state(&State);
+  Vector2L MStart = {State.min_x, State.min_y};
+  Vector2L MEnd = {State.max_x, State.max_y}; 
+  Vector2 Start, End;
+  int panel_max_width = 200; 
+	int drawing_rectangle = 0;
+  long double zoom_level = 1;
+  bool panel_open = 0;
+  // creating the color palette 
   for(int i = 0; i < 255; i++) {
     long double t = i / 255.0L;
     palette[i] = (Color){(0 - t) * 29 + (241) * t,  (1-t) * 189 + (81) * t, (1 - t) * 230 + (94) * t, 255};
 	}
-	printf("RATIO: %f\n", RATIO);
-	long double t0 = GetTime();
+	
+  // setting the window
 	InitWindow(WINDOW_X, WINDOW_Y, "Mandelbrot");
+  GuiLoadStyle("style_cyber.rgs");
 	BeginDrawing();
 	ClearBackground(WHITE);
 	EndDrawing();
 	SetTargetFPS(60);
-	Image img = StartingImage(&State);
+	
+  // generate and load initial image
+  Image img = BlankStartingImage();
+  update_Image_abs(img.data, MStart, MEnd, &State); 
 	Texture2D texture = LoadTextureFromImage(img);
-	Vector2 Start = {-1,-1};
-	Vector2 End = {-1,-1};
-	int drawing_rectangle = 0;
-  long double zoom_level = 1;
+
   while(!WindowShouldClose())
 	{
 		BeginDrawing();
 		ClearBackground(WHITE);
 		DrawTexture(texture, 0, 0, WHITE);
-    bool panel_open = 0;
-    if(GuiButton((Rectangle){2400, 50, 100, 100}, "#96#") )
-      panel_open = !panel_open; 
+    
+    Rectangle Button = {2400, 50, 100, 100};
+    bool mouse_touching = CheckCollisionPointRec(GetMousePosition(), Button);
+    if(GuiButton((Rectangle){2400, 50, 100, 100}, "#96#"))
+      panel_open = !panel_open;
+    if(mouse_touching)
+    {
+
+    }
     else if(IsKeyPressed(KEY_R))
     {
       reset_state(&State);
-      img = StartingImage(&State);
+      update_Image_abs(img.data, MStart, MEnd, &State);
       texture = LoadTextureFromImage(img);
       zoom_level = 1.0L;
     }
@@ -69,7 +85,7 @@ int main(void) {
 			printf("NUM ITERATIONS: %d\n", State.num_iterations);
       zoom_level = 2.47L / (State.max_x - State.min_x);
       printf("ZOOM LEVEL: %Lf\n", zoom_level);
-    }      
+    }
     DrawText(TextFormat("Zoom Level: %LE", zoom_level), 200, 100, 40, RED);
 		EndDrawing();
 

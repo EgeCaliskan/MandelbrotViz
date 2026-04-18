@@ -6,8 +6,12 @@ Color color(int n, long double cx, long double cy);
 Vector2L to_mandelbrot_coordinates(Vector2L coord, StateHolder* StatePtr); 
 Image StartingImage(StateHolder* StatePtr);
 void update_Image(Color* pixelptr, Vector2 Start, Vector2 End, StateHolder* StatePtr);
-
+void update_Image_abs(Color* pixelptr, Vector2L Start, Vector2L End, StateHolder* StatePtr);
 void reset_state(StateHolder* StatePtr);
+Image BlankStartingImage();
+
+
+
 void CalculateMandelbrot(Color* pixelptr, Vector2L Start, Vector2L End, StateHolder* StatePtr)
 { 
   StatePtr->min_x = Start.x;
@@ -20,7 +24,7 @@ void CalculateMandelbrot(Color* pixelptr, Vector2L Start, Vector2L End, StateHol
   printf("START (MANDELBROT): %Lf %Lf\n", Start.x, Start.y);
   printf("END (MANDELBROT): %Lf %Lf\n",End.x, End.y);
   int val, id;
-  omp_set_num_threads(16);
+
   #pragma omp parallel private(val, id)
   {
     id = omp_get_thread_num();
@@ -67,6 +71,22 @@ Vector2L to_mandelbrot_coordinates(Vector2L coord, StateHolder* StatePtr)
   return res;
 }
 
+Image BlankStartingImage()
+{
+  Color* pixels = malloc(sizeof(Color) * RES_X * RES_Y);
+  Color* p = pixels;
+ 
+  Image img = {
+    .width = RES_X,
+    .height = RES_Y,
+    .data = pixels,
+    .format = PIXELFORMAT_UNCOMPRESSED_R8G8B8A8,
+    .mipmaps = 1,
+  };
+  return img;
+}
+
+//to phase out!!!
 Image StartingImage(StateHolder* StatePtr)
 {
 
@@ -101,7 +121,18 @@ Image StartingImage(StateHolder* StatePtr)
   return img;
 }
 
+void update_Image_abs(Color* pixelptr, Vector2L Start, Vector2L End, StateHolder* StatePtr)
+{
+  Vector2L UpperLeft, LowerRight;
+  UpperLeft.x = MIN(Start.x, End.x);
+  UpperLeft.y = MIN(Start.y, End.y);
+  LowerRight.x = MAX(Start.x, End.x);
+  LowerRight.y = MAX(Start.y, End.y);
+  CalculateMandelbrot(pixelptr, UpperLeft, LowerRight, StatePtr); 
 
+}
+
+//Partially replaced
 void update_Image(Color* pixelptr, Vector2 Start, Vector2 End, StateHolder* StatePtr)
 {
   Vector2L UpperLeft, LowerRight;
