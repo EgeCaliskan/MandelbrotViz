@@ -4,10 +4,10 @@
 #include <stdio.h>
 #include <math.h>
 #include <stdlib.h>
-#define RES_X 2520
-#define RES_Y 1680
-#define WINDOW_X 2520
-#define WINDOW_Y 1680
+#define RES_X 1920
+#define RES_Y 1080
+#define WINDOW_X 1920
+#define WINDOW_Y 1080
 #define RATIO (((long double)(RES_X))/((long double)(RES_Y)))
 #define MIN(X,Y) (((X) > (Y)) ? (Y) : (X))
 #define ABS(X) (((X) > 0) ? (X) : -(X))

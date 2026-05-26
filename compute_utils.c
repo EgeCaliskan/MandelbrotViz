@@ -27,16 +27,13 @@ void CalculateMandelbrot(Color* pixelptr, Vector2L Start, Vector2L End, StateHol
 
   #pragma omp parallel private(val, id)
   {
-    id = omp_get_thread_num();
+    #pragma omp for schedule(dynamic, 4)
     for(int y = 0; y < RES_Y; y++)
     {
       for(int x = 0; x < RES_X; x++)
       {
-        if((RES_X * y + x)%16 == id)
-        {
           val = n_it(Start.x + x_stepsize * x, Start.y - y_stepsize * y, StatePtr);
           *(p + RES_X * y + x) =  color(val, Start.x + x_stepsize * x, Start.y - y_stepsize * y); 
-        }
       }
 
     }
